@@ -1,0 +1,133 @@
+.lux-home {
+  min-height: 100vh;
+  background: #0a0a0f;
+  position: relative;
+  overflow: hidden;
+  color: white;
+}
+
+/* Aurora Background */
+
+.aurora-bg {
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle at 30% 30%, #8b5cf6, transparent 60%),
+              radial-gradient(circle at 70% 70%, #3b82f6, transparent 60%);
+  filter: blur(150px);
+  opacity: 0.4;
+  animation: floatAurora 20s ease-in-out infinite alternate;
+}
+
+@keyframes floatAurora {
+  from { transform: translateY(-100px); }
+  to { transform: translateY(100px); }
+}
+
+/* Cursor Glow */
+
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* Hero */
+
+.lux-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 120px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Text */
+
+.lux-text h1 {
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.lux-text span {
+  background: linear-gradient(90deg,#8b5cf6,#22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.lux-text p {
+  margin-top: 30px;
+  font-size: 18px;
+  color: #9ca3af;
+  max-width: 500px;
+}
+
+/* Buttons */
+
+.lux-buttons {
+  margin-top: 40px;
+  display: flex;
+  gap: 20px;
+}
+
+.lux-btn-primary {
+  padding: 16px 40px;
+  border-radius: 50px;
+  background: linear-gradient(90deg,#8b5cf6,#3b82f6);
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.lux-btn-primary:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(59,130,246,0.4);
+}
+
+.lux-btn-outline {
+  padding: 16px 40px;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: 0.3s ease;
+}
+
+.lux-btn-outline:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-6px);
+}
+
+/* Floating Cards */
+
+.lux-cards {
+  position: relative;
+}
+
+.lux-card {
+  width: 300px;
+  height: 380px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(25px);
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  position: absolute;
+  animation: floatCard 8s ease-in-out infinite;
+}
+
+.lux-card.delay {
+  left: 150px;
+  top: 80px;
+  animation-delay: 4s;
+}
+
+@keyframes floatCard {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}

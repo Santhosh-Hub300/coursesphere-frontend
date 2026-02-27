@@ -1,0 +1,104 @@
+.lux-login-page {
+  min-height: 100vh;
+  background: #0a0a0f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Aurora */
+
+.aurora-bg {
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle at 30% 30%, #8b5cf6, transparent 60%),
+              radial-gradient(circle at 70% 70%, #3b82f6, transparent 60%);
+  filter: blur(150px);
+  opacity: 0.4;
+  animation: floatAurora 20s ease-in-out infinite alternate;
+}
+
+@keyframes floatAurora {
+  from { transform: translateY(-120px); }
+  to { transform: translateY(120px); }
+}
+
+/* Cursor Glow */
+
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* Card */
+
+.lux-login-card {
+  width: 420px;
+  padding: 50px;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  position: relative;
+  z-index: 2;
+  animation: floatCard 6s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.lux-login-card h2 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #9ca3af;
+  margin-bottom: 30px;
+}
+
+/* Inputs */
+
+.form-group input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 20px rgba(59,130,246,0.4);
+}
+
+/* Button */
+
+.lux-login-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(90deg,#8b5cf6,#3b82f6);
+  font-weight: 600;
+  border: none;
+  transition: 0.3s;
+}
+
+.lux-login-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(59,130,246,0.5);
+}

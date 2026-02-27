@@ -1,0 +1,335 @@
+/* ============================= */
+/* PAGE BASE */
+/* ============================= */
+
+.manage-page {
+  padding: 60px;
+  background: #06060f;
+  min-height: 100vh;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated Background Glow */
+
+.manage-page::before {
+  content: "";
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(255,0,150,0.12), transparent 70%);
+  top: -300px;
+  right: -200px;
+  filter: blur(120px);
+  animation: floatGlow 12s ease-in-out infinite alternate;
+}
+
+@keyframes floatGlow {
+  from { transform: translateY(0px); }
+  to { transform: translateY(60px); }
+}
+
+/* ============================= */
+/* HEADER */
+/* ============================= */
+
+.manage-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.manage-top h1 {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.manage-top p {
+  color: #9ca3af;
+}
+
+/* ============================= */
+/* ADD BUTTON */
+/* ============================= */
+
+.add-btn {
+  padding: 14px 28px;
+  background: linear-gradient(90deg, #ff0066, #6a00ff, #00f0ff);
+  background-size: 200%;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.4s ease;
+  animation: gradientMove 6s linear infinite;
+}
+
+@keyframes gradientMove {
+  to { background-position: 200% center; }
+}
+
+.add-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(255,0,150,0.4);
+}
+
+/* ============================= */
+/* TABLE CARD */
+/* ============================= */
+
+.table-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(30px);
+  border-radius: 22px;
+  padding: 35px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+/* Soft Gradient Border */
+
+.table-card::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  background: linear-gradient(90deg,#ff0066,#6a00ff,#00f0ff);
+  opacity: 0.06;
+  z-index: 0;
+}
+
+.table-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================= */
+/* TABLE */
+/* ============================= */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 16px;
+  font-size: 13px;
+  color: #9ca3af;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+td {
+  padding: 18px 16px;
+  font-size: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+tbody tr {
+  transition: 0.3s ease;
+}
+
+tbody tr:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-2px);
+}
+
+/* ============================= */
+/* COURSE INFO */
+/* ============================= */
+
+.course-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.course-info img {
+  width: 60px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: 0.3s ease;
+}
+
+.course-info img:hover {
+  transform: scale(1.08);
+}
+
+/* ============================= */
+/* STATUS PILL */
+/* ============================= */
+
+.pill {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
+.pill.active {
+  background: rgba(0,240,255,0.15);
+  color: #00f0ff;
+}
+
+.pill.inactive {
+  background: rgba(255,0,100,0.15);
+  color: #ff4d6d;
+}
+
+/* ============================= */
+/* MODAL BACKDROP */
+/* ============================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* ============================= */
+/* MODAL BOX */
+/* ============================= */
+
+.modal-box {
+  width: 450px;
+  background: rgba(20,20,35,0.95);
+  backdrop-filter: blur(35px);
+  padding: 35px;
+  border-radius: 25px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+  animation: modalPop 0.35s ease;
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-box h2 {
+  margin-bottom: 25px;
+}
+
+/* ============================= */
+/* FORM */
+/* ============================= */
+
+.modal-box input,
+.modal-box select,
+.modal-box textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  transition: 0.3s ease;
+}
+
+.modal-box input:focus,
+.modal-box select:focus,
+.modal-box textarea:focus {
+  outline: none;
+  border-color: #ff0066;
+  box-shadow: 0 0 0 3px rgba(255,0,150,0.25);
+}
+
+/* File Input */
+
+.modal-box input[type="file"] {
+  border: 1px dashed rgba(255,255,255,0.2);
+  cursor: pointer;
+}
+
+/* ============================= */
+/* MODAL ACTIONS */
+/* ============================= */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.modal-actions button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.modal-actions .primary {
+  background: linear-gradient(90deg,#ff0066,#6a00ff);
+  color: white;
+}
+
+.modal-actions .primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 50px rgba(255,0,150,0.4);
+}
+/* ============================= */
+/* CUSTOM SELECT DROPDOWN STYLE */
+/* ============================= */
+
+.modal-box select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: rgba(255,255,255,0.06);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+
+  background-image: linear-gradient(45deg, transparent 50%, #ff0066 50%),
+                    linear-gradient(135deg, #ff0066 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(1em + 2px),
+                       calc(100% - 15px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+
+  transition: 0.3s ease;
+}
+
+.modal-box select:focus {
+  outline: none;
+  border-color: #ff0066;
+  box-shadow: 0 0 0 3px rgba(255,0,150,0.25);
+}
+
+/* STYLE OPTIONS */
+
+.modal-box select option {
+  background: #111122;
+  color: white;
+}

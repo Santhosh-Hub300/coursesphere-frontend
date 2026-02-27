@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #0e0e12;
+  color: white;
+  font-family: "Inter", sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

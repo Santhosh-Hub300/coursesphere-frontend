@@ -1,0 +1,43 @@
+.dashboard {
+  padding: 40px;
+  min-height: 100vh;
+  background: #0e0e12;
+  position: relative;
+}
+
+/* Subtle cinematic glow */
+.dashboard::before {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255,0,102,0.15), transparent 70%);
+  top: 20%;
+  left: 30%;
+  filter: blur(120px);
+  z-index: 0;
+}
+
+.stats {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  padding: 25px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: white;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 35px 80px rgba(255,0,102,0.25);
+}

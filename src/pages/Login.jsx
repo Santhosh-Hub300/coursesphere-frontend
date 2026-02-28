@@ -34,19 +34,23 @@ export default function Login() {
         "https://coursesphere-backend.onrender.com/login",
         {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: formData.toString(),
         }
       );
 
-      const data = await response.json();
-
-      if (!data.access_token) {
+      if (!response.ok) {
         alert("Invalid email or password ❌");
         return;
       }
 
+      const data = await response.json();
+
       localStorage.setItem("token", data.access_token);
 
+      // 🔥 Fetch real user info
       const userRes = await fetch(
         "https://coursesphere-backend.onrender.com/me",
         {

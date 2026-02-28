@@ -1,12 +1,45 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./AdminDashboard.css";
-import { Navigate } from "react-router-dom";
-
 
 export default function AdminDashboard() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  const [stats, setStats] = useState({
+    total_users: 0,
+    total_courses: 0,
+    total_enrollments: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(
+          "https://coursesphere-backend.onrender.com/admin/stats",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+        setStats(data);
+      } catch (err) {
+        console.log("Error loading stats");
+      }
+    };
+
+    fetchStats();
+  }, [token]);
+
+  if (!user || user.role !== "Admin") {
+    return <Navigate to="/login" />;
+  }
+
   return (
     <div className="admin-layout">
-      {/* SIDEBAR */}
       <aside className="admin-sidebar">
         <h2 className="admin-logo">CourseSphere</h2>
 
@@ -17,67 +50,32 @@ export default function AdminDashboard() {
         </nav>
       </aside>
 
-      {/* MAIN */}
       <main className="admin-main">
-        {/* HEADER */}
         <header className="admin-header">
           <h1>Admin Dashboard</h1>
           <p>Overview & system statistics</p>
         </header>
 
-        {/* STATS */}
         <section className="stats-grid">
           <div className="stat-card">
             <h4>Total Courses</h4>
-            <span>6</span>
+            <span>{stats.total_courses}</span>
           </div>
 
           <div className="stat-card">
             <h4>Total Students</h4>
-            <span>0</span>
+            <span>{stats.total_users}</span>
           </div>
 
           <div className="stat-card">
             <h4>Active Enrollments</h4>
-            <span>0</span>
+            <span>{stats.total_enrollments}</span>
           </div>
 
           <div className="stat-card">
             <h4>Admins</h4>
             <span>1</span>
           </div>
-        </section>
-
-        {/* TABLE */}
-        <section className="admin-section">
-          <h3>Recent Enrollments</h3>
-
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Course</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Santhosh</td>
-                <td>MERN Stack</td>
-                <td><span className="status active">Active</span></td>
-              </tr>
-              <tr>
-                <td>Rahul</td>
-                <td>AI & ML</td>
-                <td><span className="status active">Active</span></td>
-              </tr>
-              <tr>
-                <td>Anjali</td>
-                <td>Data Science</td>
-                <td><span className="status pending">Pending</span></td>
-              </tr>
-            </tbody>
-          </table>
         </section>
       </main>
     </div>

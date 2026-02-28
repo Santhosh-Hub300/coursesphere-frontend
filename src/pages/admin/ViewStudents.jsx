@@ -1,8 +1,34 @@
 import { Link, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./ViewStudents.css";
 
 export default function ViewStudents() {
   const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const res = await fetch(
+          "https://coursesphere-backend.onrender.com/admin/students",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+        setStudents(data);
+      } catch (err) {
+        console.log("Error loading students");
+      }
+    };
+
+    fetchStudents();
+  }, [token]);
 
   if (!user || user.role !== "Admin") {
     return <Navigate to="/login" />;
@@ -10,7 +36,6 @@ export default function ViewStudents() {
 
   return (
     <div className="admin-layout">
-      {/* SIDEBAR */}
       <aside className="admin-sidebar">
         <h2 className="admin-logo">CourseSphere</h2>
 
@@ -23,11 +48,10 @@ export default function ViewStudents() {
         </nav>
       </aside>
 
-      {/* MAIN */}
       <main className="admin-main">
         <header className="admin-header">
           <h1>Registered Students</h1>
-          <p>Manage and monitor student enrollments</p>
+          <p>Live student enrollment data</p>
         </header>
 
         <section className="students-card">
@@ -35,35 +59,29 @@ export default function ViewStudents() {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Course</th>
-                <th>Status</th>
+                <th>Email</th>
+                <th>Enrolled Courses</th>
               </tr>
             </thead>
 
             <tbody>
-              <tr>
-                <td>Santhosh</td>
-                <td>MERN Stack</td>
-                <td>
-                  <span className="status active">Active</span>
-                </td>
-              </tr>
-
-              <tr>
-                <td>Bhargav</td>
-                <td>AI & ML</td>
-                <td>
-                  <span className="status active">Active</span>
-                </td>
-              </tr>
-
-              <tr>
-                <td>Venky</td>
-                <td>Data Science</td>
-                <td>
-                  <span className="status pending">Pending</span>
-                </td>
-              </tr>
+              {students.length === 0 ? (
+                <tr>
+                  <td colSpan="3">No students found</td>
+                </tr>
+              ) : (
+                students.map((student) => (
+                  <tr key={student.id}>
+                    <td>{student.name}</td>
+                    <td>{student.email}</td>
+                    <td>
+                      {student.courses.length === 0
+                        ? "No enrollments"
+                        : student.courses.join(", ")}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </section>

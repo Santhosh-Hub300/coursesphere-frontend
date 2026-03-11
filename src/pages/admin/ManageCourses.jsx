@@ -1,148 +1,170 @@
-import { useState, useEffect } from "react";
+import { useState,useEffect } from "react";
+import Loader from "../../components/Loader";
+import { getCourses,createCourse,deleteCourse } from "../../api.js";
+import { toast } from "react-toastify";
 import "./ManageCourses.css";
 
-export default function ManageCourses() {
-  const token = localStorage.getItem("token");
-  const [courses, setCourses] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+export default function ManageCourses(){
 
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    level: "Beginner",
-    duration: "",
-  });
+const [courses,setCourses]=useState([]);
+const [loading,setLoading]=useState(true);
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
+const [form,setForm]=useState({
+title:"",
+description:"",
+level:"Beginner",
+duration:""
+});
 
-  const fetchCourses = async () => {
-    const res = await fetch(
-      "https://coursesphere-backend.onrender.com/courses"
-    );
-    const data = await res.json();
-    setCourses(data);
-  };
+useEffect(()=>{
+fetchCourses();
+},[]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const fetchCourses = async()=>{
+setLoading(true);
+const data = await getCourses();
+setCourses(data);
+setLoading(false);
+};
 
-    await fetch(
-      "https://coursesphere-backend.onrender.com/courses",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      }
-    );
+const handleSubmit = async(e)=>{
+e.preventDefault();
 
-    setShowModal(false);
-    setForm({
-      title: "",
-      description: "",
-      level: "Beginner",
-      duration: "",
-    });
+if(!form.title || !form.description || !form.duration){
+toast.error("Please fill all fields");
+return;
+}
 
-    fetchCourses();
-  };
+try{
 
-  return (
-    <div className="manage-page">
-      <div className="manage-top">
-        <div>
-          <h1>Manage Courses</h1>
-          <p>Control and organize all platform courses</p>
-        </div>
+const data = await createCourse(form);
 
-        <button className="add-btn" onClick={() => setShowModal(true)}>
-          + Add Course
-        </button>
-      </div>
+if(data.message){
 
-      <div className="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Level</th>
-              <th>Duration</th>
-            </tr>
-          </thead>
+toast.success(data.message);
 
-          <tbody>
-            {courses.map((c) => (
-              <tr key={c.id}>
-                <td>{c.title}</td>
-                <td>{c.level}</td>
-                <td>{c.duration}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+setForm({
+title:"",
+description:"",
+level:"Beginner",
+duration:""
+});
 
-      {showModal && (
-        <div className="modal-backdrop">
-          <div className="modal-box">
-            <h2>Add New Course</h2>
+fetchCourses();
 
-            <form onSubmit={handleSubmit}>
-              <input
-                placeholder="Course Title"
-                required
-                value={form.title}
-                onChange={(e) =>
-                  setForm({ ...form, title: e.target.value })
-                }
-              />
+}else{
+toast.error(data.detail || "Course creation failed");
+}
 
-              <textarea
-                placeholder="Course Description"
-                required
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-              />
+}catch(err){
+toast.error("Server error");
+}
 
-              <select
-                value={form.level}
-                onChange={(e) =>
-                  setForm({ ...form, level: e.target.value })
-                }
-              >
-                <option>Beginner</option>
-                <option>Intermediate</option>
-                <option>Advanced</option>
-              </select>
+};
 
-              <input
-                placeholder="Duration (eg: 3 Months)"
-                required
-                value={form.duration}
-                onChange={(e) =>
-                  setForm({ ...form, duration: e.target.value })
-                }
-              />
+const handleDelete = async(id)=>{
 
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
+const data = await deleteCourse(id);
 
-                <button type="submit" className="primary">
-                  Add Course
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+if(data.message){
+toast.success(data.message);
+fetchCourses();
+}else{
+toast.error(data.detail || "Delete failed");
+}
+
+};
+
+return(
+
+<div className="manage-page">
+
+{loading && <Loader/>}
+
+<div className="manage-top">
+
+<div>
+<h1>Manage Courses</h1>
+<p>Control and organize all platform courses</p>
+</div>
+
+</div>
+
+<div className="table-card">
+
+<form onSubmit={handleSubmit} style={{marginBottom:"30px"}}>
+
+<input
+placeholder="Title"
+value={form.title}
+onChange={(e)=>setForm({...form,title:e.target.value})}
+/>
+
+<input
+placeholder="Description"
+value={form.description}
+onChange={(e)=>setForm({...form,description:e.target.value})}
+/>
+
+<input
+placeholder="Duration"
+value={form.duration}
+onChange={(e)=>setForm({...form,duration:e.target.value})}
+/>
+
+<select
+value={form.level}
+onChange={(e)=>setForm({...form,level:e.target.value})}
+>
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+
+<button className="add-btn">Add Course</button>
+
+</form>
+
+<table>
+
+<thead>
+<tr>
+<th>Course</th>
+<th>Level</th>
+<th>Duration</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{courses.map((c)=>(
+<tr key={c.id}>
+
+<td>{c.title}</td>
+<td>{c.level}</td>
+<td>{c.duration}</td>
+
+<td>
+<button
+className="add-btn"
+onClick={()=>handleDelete(c.id)}
+>
+Delete
+</button>
+</td>
+
+</tr>
+))}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+);
+
 }

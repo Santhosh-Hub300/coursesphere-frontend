@@ -1,81 +1,119 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Loader from "../../components/Loader";
+import { getMyCourses, unenrollCourse } from "../../api.js";
+import { toast } from "react-toastify";
 import "./StudentDashboard.css";
 
-export default function StudentDashboard() {
-  const [courses, setCourses] = useState([]);
-  const token = localStorage.getItem("token");
+export default function StudentDashboard(){
 
-  useEffect(() => {
-    const fetchMyCourses = async () => {
-      try {
-        const res = await fetch(
-          "https://coursesphere-backend.onrender.com/my-courses",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+const [courses,setCourses]=useState([]);
+const [loading,setLoading]=useState(true);
 
-        const data = await res.json();
-        setCourses(data);
+const fetchMyCourses = async ()=>{
 
-      } catch (err) {
-        console.log("Error loading courses");
-      }
-    };
+try{
 
-    if (token) {
-      fetchMyCourses();
-    }
-  }, [token]);
+const data = await getMyCourses();
 
-  const totalCourses = courses.length;
+setCourses(data);
 
-  return (
-    <div className="student-page">
-      <div className="student-header">
-        <div>
-          <h1>Welcome back 👋</h1>
-          <p>Track your learning progress and continue your courses</p>
-        </div>
+}catch{
 
-        <Link to="/student/report" className="report-btn">
-          View Report
-        </Link>
-      </div>
+toast.error("Failed to load courses");
 
-      <div className="student-stats">
-        <div className="stat-card">
-          <h4>Registered Courses</h4>
-          <span>{totalCourses}</span>
-        </div>
-      </div>
+}
 
-      <div className="student-section">
-        <h2>My Courses</h2>
+setLoading(false);
 
-        <div className="student-courses">
-          {courses.length === 0 ? (
-            <p>No registered courses yet.</p>
-          ) : (
-            courses.map((course) => (
-              <div className="course-box" key={course.id}>
-                <h3>{course.title}</h3>
-                <p>{course.duration}</p>
+};
 
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: "50%" }}
-                  ></div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
+useEffect(()=>{
+
+fetchMyCourses();
+
+},[]);
+
+const handleUnregister = async(id)=>{
+
+const data = await unenrollCourse(id);
+
+if(data.message){
+
+toast.success(data.message);
+
+fetchMyCourses();
+
+}else{
+
+toast.error("Unregister failed");
+
+}
+
+};
+
+return(
+
+<div className="student-page">
+
+{loading && <Loader/>}
+
+<div className="student-header">
+
+<div>
+<h1>Welcome back 👋</h1>
+<p>Track your learning progress</p>
+</div>
+
+<Link to="/courses" className="report-btn">
+Browse Courses
+</Link>
+
+</div>
+
+<div className="student-courses">
+
+{courses.length===0?(
+<p>No registered courses yet.</p>
+):( 
+
+courses.map((course)=>(
+
+<div className="course-box" key={course.id}>
+
+<h3>{course.title}</h3>
+
+<p>{course.duration}</p>
+
+<div style={{display:"flex",gap:"10px"}}>
+
+<Link
+to="/report"
+state={{course}}
+className="report-btn"
+>
+View Report
+</Link>
+
+<button
+className="unenroll-btn"
+onClick={()=>handleUnregister(course.id)}
+>
+Unregister
+</button>
+
+</div>
+
+</div>
+
+))
+
+)}
+
+</div>
+
+</div>
+
+);
+
 }

@@ -1,53 +1,78 @@
-/* CARD */
-.students-card {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 18px;
-  padding: 30px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+/* PAGE CARD */
+
+.students-card{
+background:white;
+padding:35px;
+border-radius:16px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+margin-top:20px;
 }
 
 /* TABLE */
-.students-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: white;
+
+.students-table{
+width:100%;
+border-collapse:collapse;
+font-size:14px;
 }
 
-.students-table th {
-  text-align: left;
-  padding: 14px;
-  font-size: 13px;
-  color: #9ca3af;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+/* HEADER */
+
+.students-table th{
+text-align:left;
+padding:16px;
+background:#F3F4F6;
+color:#374151;
+font-weight:600;
+border-bottom:2px solid #E5E7EB;
 }
 
-.students-table td {
-  padding: 16px 14px;
-  font-size: 15px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  transition: background 0.3s ease;
+/* BODY */
+
+.students-table td{
+padding:18px 16px;
+border-bottom:1px solid #E5E7EB;
+color:#111827;
 }
 
-.students-table tbody tr:hover {
-  background: rgba(255,255,255,0.05);
+/* ROW HOVER */
+
+.students-table tbody tr:hover{
+background:#F9FAFB;
 }
 
-/* STATUS PILL */
-.status {
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
+/* COURSE TAGS */
+
+.course-tag{
+display:inline-block;
+background:#EEF2FF;
+color:#6366F1;
+padding:5px 10px;
+border-radius:6px;
+font-size:12px;
+margin-right:6px;
+margin-bottom:4px;
 }
 
-.status.active {
-  background: rgba(34,197,94,0.2);
-  color: #22c55e;
+/* EMPTY TEXT */
+
+.no-data{
+text-align:center;
+padding:30px;
+color:#6B7280;
 }
 
-.status.pending {
-  background: rgba(245,158,11,0.2);
-  color: #f59e0b;
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.students-table{
+font-size:13px;
+}
+
+.students-table th,
+.students-table td{
+padding:12px;
+}
+
 }

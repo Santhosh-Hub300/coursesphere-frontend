@@ -1,118 +1,151 @@
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import Loader from "../components/Loader";
+import { loginUser } from "../api.js";
+import { toast } from "react-toastify";
 import "./Login.css";
 
 export default function Login() {
+
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
 
-  useEffect(() => {
+  const [loading,setLoading] = useState(false);
+
+  useEffect(()=>{
+
     const glow = document.querySelector(".cursor-glow");
 
-    const move = (e) => {
-      if (glow) {
+    const move = (e)=>{
+      if(glow){
         glow.style.left = e.clientX + "px";
         glow.style.top = e.clientY + "px";
       }
     };
 
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
+    window.addEventListener("mousemove",move);
 
-  const handleLogin = async (e) => {
+    return ()=>window.removeEventListener("mousemove",move);
+
+  },[]);
+
+  const handleLogin = async (e)=>{
+
     e.preventDefault();
 
-    try {
-      const formData = new URLSearchParams();
-      formData.append("username", email);
-      formData.append("password", password);
+    setLoading(true);
 
-      const response = await fetch(
-        "https://coursesphere-backend.onrender.com/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formData.toString(),
-        }
-      );
+    try{
 
-      if (!response.ok) {
-        alert("Invalid email or password ❌");
+      const data = await loginUser(email,password);
+
+      if(!data.access_token){
+        toast.error("Invalid email or password");
+        setLoading(false);
         return;
       }
 
-      const data = await response.json();
+      localStorage.setItem("token",data.access_token);
 
-      localStorage.setItem("token", data.access_token);
-
-      // 🔥 Fetch real user info
-      const userRes = await fetch(
+      const res = await fetch(
         "https://coursesphere-backend.onrender.com/me",
         {
-          headers: {
-            Authorization: `Bearer ${data.access_token}`,
+          headers:{
+            Authorization:`Bearer ${data.access_token}`,
           },
         }
       );
 
-      const userData = await userRes.json();
+      const userData = await res.json();
 
-      localStorage.setItem("user", JSON.stringify(userData));
-      window.dispatchEvent(new Event("userChanged"));
+      localStorage.setItem("user",JSON.stringify(userData));
 
-      if (userData.role === "Admin") {
+      toast.success("Login successful 🎉");
+
+      setLoading(false);
+
+      if(userData.role === "Admin"){
         navigate("/admin/dashboard");
-      } else {
+      }else{
         navigate("/student/dashboard");
       }
 
-    } catch (error) {
-      alert("Server error ❌");
+    }catch{
+
+      toast.error("Login failed");
+
+      setLoading(false);
+
     }
+
   };
 
   return (
+
     <div className="lux-login-page">
+
+      {loading && <Loader/>}
+
       <div className="cursor-glow"></div>
       <div className="aurora-bg"></div>
 
       <div className="lux-login-card">
+
         <h2>Welcome Back</h2>
+
         <p className="subtitle">
           Login to continue your learning journey
         </p>
 
         <form onSubmit={handleLogin}>
+
           <div className="form-group">
+
             <input
               type="email"
               placeholder="Email address"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e)=>setEmail(e.target.value)}
             />
+
           </div>
 
           <div className="form-group">
+
             <input
               type="password"
               placeholder="Password"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e)=>setPassword(e.target.value)}
             />
+
           </div>
 
-          <button type="submit" className="lux-login-btn">
-            Sign In
+          <button
+            type="submit"
+            className="lux-login-btn"
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
           </button>
+
         </form>
+
+        {/* REGISTER LINK */}
+
+        <p className="login-register">
+          Don't have an account? 
+          <Link to="/register"> Create one</Link>
+        </p>
+
       </div>
+
     </div>
+
   );
 }

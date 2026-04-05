@@ -41,10 +41,8 @@ export default function Login() {
         return;
       }
 
-      // SAVE TOKEN
       localStorage.setItem("token",data.access_token);
 
-      // GET USER
       const res = await fetch("http://127.0.0.1:8000/me", {
         headers:{
           Authorization:`Bearer ${data.access_token}`,
@@ -53,12 +51,12 @@ export default function Login() {
 
       const userData = await res.json();
 
-      // SAVE USER
       localStorage.setItem("user",JSON.stringify(userData));
+
+      window.dispatchEvent(new Event("userChanged")); // ✅ FIX
 
       toast.success("Login successful 🎉");
 
-      // REDIRECT
       if(userData.role === "Admin"){
         navigate("/admin/dashboard");
       }else{

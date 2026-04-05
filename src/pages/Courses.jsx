@@ -23,18 +23,21 @@ export default function Courses() {
 
   // ✅ Fetch courses (LOCAL BACKEND)
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch("http://127.0.0.1:8000/courses");
-        const data = await res.json();
-        setCourses(data);
-      } catch {
-        console.log("Error loading courses");
-      }
-    };
+  const fetchCourses = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/courses");
 
-    fetchCourses();
-  }, []);
+      if(!res.ok) throw new Error(); // ✅ FIX
+
+      const data = await res.json();
+      setCourses(data);
+    } catch {
+      console.log("Error loading courses");
+    }
+  };
+
+  fetchCourses();
+}, []);
 
   const filteredCourses = courses.filter((course) => {
     const level = course.level?.trim();

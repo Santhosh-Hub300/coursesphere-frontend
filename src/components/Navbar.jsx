@@ -1,10 +1,11 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import "./Navbar.css";
 
 export default function Navbar() {
 
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ NEW
   const dropdownRef = useRef(null);
 
   const [user, setUser] = useState(
@@ -14,10 +15,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  /* ---------- USER SYNC ---------- */
-
+  /* USER SYNC */
   useEffect(() => {
-
     const updateUser = () => {
       setUser(JSON.parse(localStorage.getItem("user")));
     };
@@ -26,13 +25,10 @@ export default function Navbar() {
 
     return () =>
       window.removeEventListener("userChanged", updateUser);
-
   }, []);
 
-  /* ---------- CLICK OUTSIDE DROPDOWN ---------- */
-
+  /* CLICK OUTSIDE */
   useEffect(() => {
-
     function handleClickOutside(e) {
       if (
         dropdownRef.current &&
@@ -46,47 +42,44 @@ export default function Navbar() {
 
     return () =>
       document.removeEventListener("mousedown", handleClickOutside);
-
   }, []);
 
-  /* ---------- LOGOUT ---------- */
-
+  /* LOGOUT */
   const handleLogout = () => {
-
     localStorage.removeItem("user");
     localStorage.removeItem("token");
 
     setUser(null);
     setOpen(false);
 
+    window.dispatchEvent(new Event("userChanged"));
+
     navigate("/");
   };
 
-  /* ---------- 🔥 DYNAMIC SEARCH (DEBOUNCE) ---------- */
-
+  /* 🔥 FIXED SEARCH (NO REDIRECT BUG) */
   useEffect(() => {
 
-    if (user?.role === "Admin") return;
+    // 🚫 STOP on login/register pages
+    if (
+      user?.role === "Admin" ||
+      location.pathname === "/login" ||
+      location.pathname === "/register"
+    ) return;
+
+    // 🚫 STOP if search empty (prevents auto redirect)
+    if (!search.trim()) return;
 
     const delay = setTimeout(() => {
-
-      if (search.trim()) {
-        navigate(`/courses?search=${search}`);
-      } else {
-        navigate("/courses");
-      }
-
-    }, 300); // smooth typing
+      navigate(`/courses?search=${search}`);
+    }, 300);
 
     return () => clearTimeout(delay);
 
-  }, [search]);
+  }, [search, user, navigate, location.pathname]);
 
   return (
-
     <nav className="navbar">
-
-      {/* LEFT */}
       <div className="nav-left">
         <Link to="/" className="logo-wrapper">
           <div className="logo-icon">⚡</div>
@@ -94,17 +87,14 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* CENTER */}
       <div className="nav-center">
 
-        {/* ❌ Hide Courses for Admin */}
         {user?.role !== "Admin" && (
           <NavLink to="/courses" className="nav-item">
             Courses
           </NavLink>
         )}
 
-        {/* 🔍 Dynamic Search */}
         {user?.role !== "Admin" && (
           <form className="search-box" onSubmit={(e)=>e.preventDefault()}>
             <input
@@ -130,7 +120,6 @@ export default function Navbar() {
 
       </div>
 
-      {/* RIGHT */}
       <div className="nav-right">
 
         {!user ? (
@@ -198,7 +187,6 @@ export default function Navbar() {
         )}
 
       </div>
-
     </nav>
   );
 }

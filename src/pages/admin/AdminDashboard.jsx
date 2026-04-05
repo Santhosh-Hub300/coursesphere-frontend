@@ -16,7 +16,7 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         const res = await fetch(
-          "https://coursesphere-backend.onrender.com/admin/stats",
+          "http://127.0.0.1:8000/admin/stats", // ✅ FIXED
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -24,8 +24,11 @@ export default function AdminDashboard() {
           }
         );
 
+        if (!res.ok) throw new Error();
+
         const data = await res.json();
         setStats(data);
+
       } catch (err) {
         console.log("Error loading stats");
       }

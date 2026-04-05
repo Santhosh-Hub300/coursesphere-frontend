@@ -1,117 +1,42 @@
-import { useNavigate, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import Loader from "../components/Loader";
-import { loginUser } from "../api.js";
-import { toast } from "react-toastify";
-import "./Login.css";
+import { Link } from "react-router-dom";
+import "./Home.css";
 
-export default function Login() {
-
-  const navigate = useNavigate();
-
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
-  const [loading,setLoading] = useState(false);
-
-  useEffect(()=>{
-    const glow = document.querySelector(".cursor-glow");
-
-    const move = (e)=>{
-      if(glow){
-        glow.style.left = e.clientX + "px";
-        glow.style.top = e.clientY + "px";
-      }
-    };
-
-    window.addEventListener("mousemove",move);
-    return ()=>window.removeEventListener("mousemove",move);
-
-  },[]);
-
-  const handleLogin = async (e)=>{
-    e.preventDefault();
-    setLoading(true);
-
-    try{
-      const data = await loginUser(email,password);
-
-      if(!data.access_token){
-        toast.error("Invalid email or password");
-        setLoading(false);
-        return;
-      }
-
-      localStorage.setItem("token",data.access_token);
-
-      const res = await fetch("http://127.0.0.1:8000/me", {
-        headers:{
-          Authorization:`Bearer ${data.access_token}`,
-        },
-      });
-
-      const userData = await res.json();
-
-      localStorage.setItem("user",JSON.stringify(userData));
-
-      toast.success("Login successful 🎉");
-
-      if(userData.role === "Admin"){
-        navigate("/admin/dashboard");
-      }else{
-        navigate("/student/dashboard");
-      }
-
-    }catch{
-      toast.error("Login failed");
-    }
-
-    setLoading(false);
-  };
-
+export default function Home() {
   return (
-    <div className="lux-login-page">
+    <div className="home">
 
-      {loading && <Loader/>}
+      <section className="hero">
 
-      <div className="lux-login-card">
+        <div className="hero-left">
+          <h1>
+            Upgrade Your <br />
+            Skills With <span>Modern Tech Courses</span>
+          </h1>
 
-        <h2>Welcome Back</h2>
-        <p className="subtitle">Login to continue your learning journey</p>
+          <p>
+            Learn web development, AI, and data science through
+            industry-level projects and expert instructors.
+          </p>
 
-        <form onSubmit={handleLogin}>
+          <div className="hero-buttons">
+            <Link to="/courses" className="btn-primary">
+              Explore Courses
+            </Link>
 
-          <div className="form-group">
-            <input
-              type="email"
-              placeholder="Email address"
-              required
-              value={email}
-              onChange={(e)=>setEmail(e.target.value)}
-            />
+            <Link to="/register" className="btn-secondary">
+              Get Started
+            </Link>
           </div>
+        </div>
 
-          <div className="form-group">
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              value={password}
-              onChange={(e)=>setPassword(e.target.value)}
-            />
-          </div>
+        <div className="hero-right">
+          <img
+            src="https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+            alt="Learning"
+          />
+        </div>
 
-          <button className="lux-login-btn" type="submit" disabled={loading}>
-            {loading ? "Signing In..." : "Sign In"}
-          </button>
-
-        </form>
-
-        <p className="login-register">
-          Don't have an account?
-          <Link to="/register"> Create one</Link>
-        </p>
-
-      </div>
+      </section>
 
     </div>
   );

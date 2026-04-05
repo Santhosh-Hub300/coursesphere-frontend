@@ -34,14 +34,12 @@ export default function Navbar() {
   useEffect(() => {
 
     function handleClickOutside(e) {
-
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target)
       ) {
         setOpen(false);
       }
-
     }
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -62,62 +60,61 @@ export default function Navbar() {
     setOpen(false);
 
     navigate("/");
-
   };
 
-  /* ---------- SEARCH ---------- */
+  /* ---------- 🔥 DYNAMIC SEARCH (DEBOUNCE) ---------- */
 
-  const handleSearch = (e) => {
+  useEffect(() => {
 
-    e.preventDefault();
+    if (user?.role === "Admin") return;
 
-    if (search.trim()) {
-      navigate(`/courses?search=${search}`);
-    }
+    const delay = setTimeout(() => {
 
-  };
+      if (search.trim()) {
+        navigate(`/courses?search=${search}`);
+      } else {
+        navigate("/courses");
+      }
+
+    }, 300); // smooth typing
+
+    return () => clearTimeout(delay);
+
+  }, [search]);
 
   return (
 
     <nav className="navbar">
 
       {/* LEFT */}
-
       <div className="nav-left">
-
         <Link to="/" className="logo-wrapper">
-
           <div className="logo-icon">⚡</div>
-
-          <span className="logo-text">
-            CourseSphere
-          </span>
-
+          <span className="logo-text">CourseSphere</span>
         </Link>
-
       </div>
 
-
       {/* CENTER */}
-
       <div className="nav-center">
 
-        <NavLink to="/courses" className="nav-item">
-          Courses
-        </NavLink>
+        {/* ❌ Hide Courses for Admin */}
+        {user?.role !== "Admin" && (
+          <NavLink to="/courses" className="nav-item">
+            Courses
+          </NavLink>
+        )}
 
-        {/* SEARCH BAR */}
-
-        <form className="search-box" onSubmit={handleSearch}>
-
-          <input
-            type="text"
-            placeholder="Search for courses..."
-            value={search}
-            onChange={(e)=>setSearch(e.target.value)}
-          />
-
-        </form>
+        {/* 🔍 Dynamic Search */}
+        {user?.role !== "Admin" && (
+          <form className="search-box" onSubmit={(e)=>e.preventDefault()}>
+            <input
+              type="text"
+              placeholder="Search for courses..."
+              value={search}
+              onChange={(e)=>setSearch(e.target.value)}
+            />
+          </form>
+        )}
 
         {user?.role === "Student" && (
           <NavLink to="/student/dashboard" className="nav-item">
@@ -133,20 +130,13 @@ export default function Navbar() {
 
       </div>
 
-
       {/* RIGHT */}
-
       <div className="nav-right">
 
         {!user ? (
           <>
-            <Link to="/login" className="btn-login">
-              Login
-            </Link>
-
-            <Link to="/register" className="btn-signup">
-              Sign Up
-            </Link>
+            <Link to="/login" className="btn-login">Login</Link>
+            <Link to="/register" className="btn-signup">Sign Up</Link>
           </>
         ) : (
 
@@ -164,23 +154,15 @@ export default function Navbar() {
               <div className="profile-dropdown">
 
                 <div className="profile-header">
-
                   <div className="profile-avatar-large">
                     {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                   </div>
 
                   <div>
-
                     <p className="profile-name">{user.name}</p>
-
                     <p className="profile-email">{user.email}</p>
-
-                    <span className="role-badge">
-                      {user.role}
-                    </span>
-
+                    <span className="role-badge">{user.role}</span>
                   </div>
-
                 </div>
 
                 <hr />
@@ -196,14 +178,6 @@ export default function Navbar() {
                   className="dropdown-item"
                 >
                   🏠 Dashboard
-                </div>
-
-                <div className="dropdown-item">
-                  ⚙ Settings
-                </div>
-
-                <div className="dropdown-item">
-                  ❓ Help Center
                 </div>
 
                 <hr />
@@ -226,7 +200,5 @@ export default function Navbar() {
       </div>
 
     </nav>
-
   );
-
 }

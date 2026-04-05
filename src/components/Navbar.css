@@ -117,7 +117,7 @@ cursor:pointer;
 .profile-dropdown{
 position:absolute;
 right:0;
-top:60px;
+top:6px;
 width:280px;
 background:white;
 border-radius:12px;
@@ -128,8 +128,10 @@ box-shadow:0 20px 40px rgba(0,0,0,0.1);
 
 .dropdown-item{
 padding:10px;
+padding-top: 5px;
 border-radius:8px;
 cursor:pointer;
+color: #8B5CF6;
 }
 
 .dropdown-item:hover{

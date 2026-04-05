@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import "./ViewStudents.css";
 
 export default function ViewStudents() {
+
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
 
@@ -12,7 +13,7 @@ export default function ViewStudents() {
     const fetchStudents = async () => {
       try {
         const res = await fetch(
-          "https://coursesphere-backend.onrender.com/admin/students",
+          "http://127.0.0.1:8000/admin/students", // 🔥 use local backend
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -21,9 +22,17 @@ export default function ViewStudents() {
         );
 
         const data = await res.json();
-        setStudents(data);
+
+        // ✅ FIX
+        if (Array.isArray(data)) {
+          setStudents(data);
+        } else {
+          setStudents([]);
+        }
+
       } catch (err) {
         console.log("Error loading students");
+        setStudents([]);
       }
     };
 
@@ -36,6 +45,7 @@ export default function ViewStudents() {
 
   return (
     <div className="admin-layout">
+
       <aside className="admin-sidebar">
         <h2 className="admin-logo">CourseSphere</h2>
 
@@ -49,6 +59,7 @@ export default function ViewStudents() {
       </aside>
 
       <main className="admin-main">
+
         <header className="admin-header">
           <h1>Registered Students</h1>
           <p>Live student enrollment data</p>
@@ -56,6 +67,7 @@ export default function ViewStudents() {
 
         <section className="students-card">
           <table className="students-table">
+
             <thead>
               <tr>
                 <th>Name</th>
@@ -75,7 +87,7 @@ export default function ViewStudents() {
                     <td>{student.name}</td>
                     <td>{student.email}</td>
                     <td>
-                      {student.courses.length === 0
+                      {!student.courses || student.courses.length === 0
                         ? "No enrollments"
                         : student.courses.join(", ")}
                     </td>
@@ -83,8 +95,10 @@ export default function ViewStudents() {
                 ))
               )}
             </tbody>
+
           </table>
         </section>
+
       </main>
     </div>
   );

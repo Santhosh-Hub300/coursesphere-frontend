@@ -1,20 +1,34 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./Courses.css";
 
 export default function Courses() {
+
   const [courses, setCourses] = useState([]);
   const [filter, setFilter] = useState("All");
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const query = new URLSearchParams(location.search);
+  const searchText = query.get("search") || "";
+
+  // 🚫 Block admin
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.role === "Admin") {
+      navigate("/admin/dashboard");
+    }
+  }, []);
+
+  // ✅ Fetch courses (LOCAL BACKEND)
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch(
-          "https://coursesphere-backend.onrender.com/courses?limit=100"
-        );
+        const res = await fetch("http://127.0.0.1:8000/courses");
         const data = await res.json();
         setCourses(data);
-      } catch (err) {
+      } catch {
         console.log("Error loading courses");
       }
     };
@@ -22,18 +36,27 @@ export default function Courses() {
     fetchCourses();
   }, []);
 
-  const filteredCourses =
-    filter === "All"
-      ? courses
-      : courses.filter((course) => course.level === filter);
+  const filteredCourses = courses.filter((course) => {
+    const level = course.level?.trim();
+
+    const matchesLevel =
+      filter === "All" || level === filter;
+
+    const matchesSearch =
+      course.title.toLowerCase().includes(searchText.toLowerCase());
+
+    return matchesLevel && matchesSearch;
+  });
 
   return (
     <div className="courses-page">
+
       <div className="courses-hero">
         <h1>All Courses</h1>
-        <p>Learn in-demand skills with industry-focused programs</p>
+        <p>Learn in-demand skills 🚀</p>
       </div>
 
+      {/* FILTER */}
       <div className="course-filters">
         {["All", "Beginner", "Intermediate", "Advanced"].map((level) => (
           <span
@@ -46,23 +69,30 @@ export default function Courses() {
         ))}
       </div>
 
+      {/* COURSES */}
       <div className="courses-grid">
+
         {filteredCourses.length === 0 ? (
-          <p style={{ padding: "40px" }}>No courses available.</p>
+          <p className="empty">No courses found 😢</p>
         ) : (
+
           filteredCourses.map((course) => (
             <div className="course-card" key={course.id}>
-              <div className="card-img">
-                <img
-                  src="https://via.placeholder.com/300"
-                  alt={course.title}
-                />
-                <span className="badge level">{course.level}</span>
-                <span className="badge duration">{course.duration}</span>
+
+              <div className="card-top">
+                <span className={`level-badge level-${course.level?.trim().toLowerCase()}`}>
+                  {course.level}
+                </span>
+
+                <span className="duration-badge">
+                  {course.duration}
+                </span>
               </div>
 
               <div className="card-body">
                 <h3>{course.title}</h3>
+                <p>{course.description}</p>
+
                 <Link
                   to={`/courses/${course.id}`}
                   className="details-btn"
@@ -70,10 +100,14 @@ export default function Courses() {
                   View Details →
                 </Link>
               </div>
+
             </div>
           ))
+
         )}
+
       </div>
+
     </div>
   );
 }

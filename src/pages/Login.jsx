@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Loader from "../components/Loader";
 import { loginUser } from "../api.js";
@@ -12,11 +11,9 @@ export default function Login() {
 
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState("");
-
   const [loading,setLoading] = useState(false);
 
   useEffect(()=>{
-
     const glow = document.querySelector(".cursor-glow");
 
     const move = (e)=>{
@@ -27,19 +24,15 @@ export default function Login() {
     };
 
     window.addEventListener("mousemove",move);
-
     return ()=>window.removeEventListener("mousemove",move);
 
   },[]);
 
   const handleLogin = async (e)=>{
-
     e.preventDefault();
-
     setLoading(true);
 
     try{
-
       const data = await loginUser(email,password);
 
       if(!data.access_token){
@@ -48,25 +41,24 @@ export default function Login() {
         return;
       }
 
+      // SAVE TOKEN
       localStorage.setItem("token",data.access_token);
 
-      const res = await fetch(
-        "https://coursesphere-backend.onrender.com/me",
-        {
-          headers:{
-            Authorization:`Bearer ${data.access_token}`,
-          },
-        }
-      );
+      // GET USER
+      const res = await fetch("http://127.0.0.1:8000/me", {
+        headers:{
+          Authorization:`Bearer ${data.access_token}`,
+        },
+      });
 
       const userData = await res.json();
 
+      // SAVE USER
       localStorage.setItem("user",JSON.stringify(userData));
 
       toast.success("Login successful 🎉");
 
-      setLoading(false);
-
+      // REDIRECT
       if(userData.role === "Admin"){
         navigate("/admin/dashboard");
       }else{
@@ -74,17 +66,13 @@ export default function Login() {
       }
 
     }catch{
-
       toast.error("Login failed");
-
-      setLoading(false);
-
     }
 
+    setLoading(false);
   };
 
   return (
-
     <div className="lux-login-page">
 
       {loading && <Loader/>}
@@ -95,57 +83,39 @@ export default function Login() {
       <div className="lux-login-card">
 
         <h2>Welcome Back</h2>
-
-        <p className="subtitle">
-          Login to continue your learning journey
-        </p>
+        <p className="subtitle">Login to continue your learning journey</p>
 
         <form onSubmit={handleLogin}>
 
-          <div className="form-group">
+          <input
+            type="email"
+            placeholder="Email address"
+            required
+            value={email}
+            onChange={(e)=>setEmail(e.target.value)}
+          />
 
-            <input
-              type="email"
-              placeholder="Email address"
-              required
-              value={email}
-              onChange={(e)=>setEmail(e.target.value)}
-            />
+          <input
+            type="password"
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+          />
 
-          </div>
-
-          <div className="form-group">
-
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              value={password}
-              onChange={(e)=>setPassword(e.target.value)}
-            />
-
-          </div>
-
-          <button
-            type="submit"
-            className="lux-login-btn"
-            disabled={loading}
-          >
+          <button type="submit" disabled={loading}>
             {loading ? "Signing In..." : "Sign In"}
           </button>
 
         </form>
 
-        {/* REGISTER LINK */}
-
-        <p className="login-register">
-          Don't have an account? 
+        <p>
+          Don't have an account?
           <Link to="/register"> Create one</Link>
         </p>
 
       </div>
 
     </div>
-
   );
 }

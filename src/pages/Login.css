@@ -1,71 +1,90 @@
 .lux-login-page{
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#F9FAFB;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(135deg,#eef2ff,#f9fafb);
+  font-family:"Poppins",sans-serif;
 }
 
+/* CARD */
 .lux-login-card{
-width:420px;
-background:white;
-padding:40px;
-border-radius:16px;
-box-shadow:0 10px 30px rgba(0,0,0,.1);
+  width:400px;
+  background:white;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.1);
+  transition:.3s;
 }
 
+.lux-login-card:hover{
+  transform:translateY(-5px);
+}
+
+/* TITLE */
 .lux-login-card h2{
-font-size:28px;
-margin-bottom:8px;
-color:#111827;
+  font-size:28px;
+  margin-bottom:8px;
+  color:#111827;
+  font-weight:700;
 }
 
 .subtitle{
-color:#6B7280;
-margin-bottom:25px;
+  color:#6B7280;
+  margin-bottom:25px;
+  font-size:14px;
 }
 
-.form-group input{
-width:100%;
-padding:12px;
-border-radius:8px;
-border:1px solid #e5e7eb;
-margin-bottom:15px;
+/* INPUT */
+.lux-login-card input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  margin-bottom:15px;
+  font-size:14px;
+  transition:.2s;
 }
 
-.form-group input:focus{
-border:1px solid #6366F1;
-outline:none;
+.lux-login-card input:focus{
+  border-color:#6366F1;
+  box-shadow:0 0 0 3px rgba(99,102,241,0.2);
+  outline:none;
 }
 
-.lux-login-btn{
-width:100%;
-padding:12px;
-border-radius:8px;
-border:none;
-background:#6366F1;
-color:white;
-font-weight:600;
-cursor:pointer;
+/* BUTTON */
+.lux-login-card button{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg,#6366F1,#4F46E5);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:.3s;
 }
 
-.lux-login-btn:hover{
-background:#4f46e5;
-}
-.login-register{
-margin-top:20px;
-text-align:center;
-font-size:14px;
-color:#9ca3af;
+.lux-login-card button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(79,70,229,.3);
 }
 
-.login-register a{
-color:#6366F1;
-text-decoration:none;
-font-weight:600;
-margin-left:5px;
+/* BOTTOM TEXT */
+.lux-login-card p{
+  margin-top:20px;
+  text-align:center;
+  font-size:14px;
+  color:#6b7280;
 }
 
-.login-register a:hover{
-text-decoration:underline;
+.lux-login-card a{
+  color:#6366F1;
+  text-decoration:none;
+  font-weight:600;
+  margin-left:5px;
+}
+
+.lux-login-card a:hover{
+  text-decoration:underline;
 }

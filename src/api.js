@@ -1,19 +1,26 @@
-const BASE_URL = "https://coursesphere-backend.onrender.com";
+const BASE_URL = "http://127.0.0.1:8000";
 
-/* ===============================
-AUTH
-================================ */
+/* ================= AUTH ================= */
 
+// ✅ REGISTER
 export const registerUser = async (data) => {
+  const formData = new URLSearchParams();
+  formData.append("name", data.name);
+  formData.append("email", data.email);
+  formData.append("password", data.password);
+
   const res = await fetch(`${BASE_URL}/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: formData.toString(),
   });
 
   return res.json();
 };
 
+// ✅ LOGIN
 export const loginUser = async (email, password) => {
   const formData = new URLSearchParams();
   formData.append("username", email);
@@ -30,34 +37,58 @@ export const loginUser = async (email, password) => {
   return res.json();
 };
 
-/* ===============================
-COURSES
-================================ */
 
-export const getCourses = async () => {
-  const res = await fetch(`${BASE_URL}/courses?limit=100`);
-  return res.json();
-};
+/* ================= USER ================= */
 
-export const createCourse = async (data) => {
+// ✅ GET CURRENT USER
+export const getCurrentUser = async () => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${BASE_URL}/courses`, {
-    method: "POST",
+  const res = await fetch(`${BASE_URL}/me`, {
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(data),
   });
 
   return res.json();
 };
 
-export const deleteCourse = async (courseId) => {
+
+/* ================= COURSES ================= */
+
+// ✅ GET COURSES
+export const getCourses = async () => {
+  const res = await fetch(`${BASE_URL}/courses`);
+  return res.json();
+};
+
+// ✅ CREATE COURSE
+export const createCourse = async (form) => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${BASE_URL}/courses/${courseId}`, {
+  const formData = new URLSearchParams();
+  formData.append("title", form.title);
+  formData.append("description", form.description);
+  formData.append("level", form.level);
+  formData.append("duration", form.duration);
+
+  const res = await fetch(`${BASE_URL}/courses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData.toString(),
+  });
+
+  return res.json();
+};
+
+// ✅ DELETE COURSE
+export const deleteCourse = async (id) => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${BASE_URL}/courses/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -67,10 +98,10 @@ export const deleteCourse = async (courseId) => {
   return res.json();
 };
 
-/* ===============================
-ENROLLMENT
-================================ */
 
+/* ================= ENROLL ================= */
+
+// ✅ ENROLL
 export const enrollCourse = async (courseId) => {
   const token = localStorage.getItem("token");
 
@@ -84,6 +115,7 @@ export const enrollCourse = async (courseId) => {
   return res.json();
 };
 
+// ✅ UNENROLL (🔥 FIX ADDED BACK → NO ERROR NOW)
 export const unenrollCourse = async (courseId) => {
   const token = localStorage.getItem("token");
 
@@ -97,38 +129,14 @@ export const unenrollCourse = async (courseId) => {
   return res.json();
 };
 
+
+/* ================= MY COURSES ================= */
+
+// ✅ GET MY COURSES
 export const getMyCourses = async () => {
   const token = localStorage.getItem("token");
 
   const res = await fetch(`${BASE_URL}/my-courses`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return res.json();
-};
-
-/* ===============================
-ADMIN
-================================ */
-
-export const getAdminStats = async () => {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch(`${BASE_URL}/admin/stats`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return res.json();
-};
-
-export const getAllStudents = async () => {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch(`${BASE_URL}/admin/students`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

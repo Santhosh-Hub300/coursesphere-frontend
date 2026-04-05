@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loader from "../../components/Loader";
 import { getMyCourses, unenrollCourse } from "../../api.js";
@@ -7,113 +7,105 @@ import "./StudentDashboard.css";
 
 export default function StudentDashboard(){
 
-const [courses,setCourses]=useState([]);
-const [loading,setLoading]=useState(true);
+  const navigate = useNavigate();
 
-const fetchMyCourses = async ()=>{
+  const [courses,setCourses]=useState([]);
+  const [loading,setLoading]=useState(true);
 
-try{
+  const user = JSON.parse(localStorage.getItem("user"));
 
-const data = await getMyCourses();
+  const fetchMyCourses = async ()=>{
+    try{
+      const data = await getMyCourses();
+      setCourses(Array.isArray(data) ? data : []);
+    }catch{
+      toast.error("Failed to load courses");
+    }
+    setLoading(false);
+  };
 
-setCourses(data);
+  useEffect(()=>{
+    fetchMyCourses();
+  },[]);
 
-}catch{
+  const handleUnregister = async(id)=>{
+    try{
+      const data = await unenrollCourse(id);
 
-toast.error("Failed to load courses");
+      if(data.message){
+        toast.success(data.message);
+        fetchMyCourses();
+      }else{
+        toast.error("Unenroll failed");
+      }
 
-}
+    }catch{
+      toast.error("Server error");
+    }
+  };
 
-setLoading(false);
+  const handleLogout = ()=>{
+    localStorage.clear();
+    navigate("/login");
+  };
 
-};
+  return(
+    <div className="student-page">
 
-useEffect(()=>{
+      {loading && <Loader/>}
 
-fetchMyCourses();
+      {/* ✅ HEADER */}
+      <div className="student-header">
 
-},[]);
+        <div>
+          <h1>Student Dashboard</h1>
+          <p>Welcome, {user?.name}</p>
+        </div>
 
-const handleUnregister = async(id)=>{
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
 
-const data = await unenrollCourse(id);
+      </div>
 
-if(data.message){
+      {/* ✅ COURSES */}
+      {courses.length===0 ? (
+        <p>No courses enrolled</p>
+      ) : (
 
-toast.success(data.message);
+        <div className="student-courses">
 
-fetchMyCourses();
+          {courses.map(course=>(
 
-}else{
+            <div key={course.id} className="course-box">
 
-toast.error("Unregister failed");
+              <h3>{course.title}</h3>
+              <p>{course.duration}</p>
 
-}
+              {/* ✅ REPORT BUTTON */}
+              <Link
+                to="/report"
+                state={{ course }}
+                className="report-btn"
+              >
+                View Report
+              </Link>
 
-};
+              <button
+                className="unenroll-btn"
+                onClick={()=>handleUnregister(course.id)}
+              >
+                Unenroll
+              </button>
 
-return(
+            </div>
 
-<div className="student-page">
+          ))}
 
-{loading && <Loader/>}
+        </div>
 
-<div className="student-header">
+      )}
 
-<div>
-<h1>Welcome back 👋</h1>
-<p>Track your learning progress</p>
-</div>
-
-<Link to="/courses" className="report-btn">
-Browse Courses
-</Link>
-
-</div>
-
-<div className="student-courses">
-
-{courses.length===0?(
-<p>No registered courses yet.</p>
-):( 
-
-courses.map((course)=>(
-
-<div className="course-box" key={course.id}>
-
-<h3>{course.title}</h3>
-
-<p>{course.duration}</p>
-
-<div style={{display:"flex",gap:"10px"}}>
-
-<Link
-to="/report"
-state={{course}}
-className="report-btn"
->
-View Report
-</Link>
-
-<button
-className="unenroll-btn"
-onClick={()=>handleUnregister(course.id)}
->
-Unregister
-</button>
-
-</div>
-
-</div>
-
-))
-
-)}
-
-</div>
-
-</div>
-
-);
-
+    </div>
+  );
 }

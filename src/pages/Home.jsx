@@ -1,127 +1,117 @@
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getCourses } from "../api";
-import "./Home.css";
+import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Loader from "../components/Loader";
+import { loginUser } from "../api.js";
+import { toast } from "react-toastify";
+import "./Login.css";
 
-export default function Home() {
+export default function Login() {
 
-  const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    loadCourses();
-  }, []);
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [loading,setLoading] = useState(false);
 
-  const loadCourses = async () => {
+  useEffect(()=>{
+    const glow = document.querySelector(".cursor-glow");
+
+    const move = (e)=>{
+      if(glow){
+        glow.style.left = e.clientX + "px";
+        glow.style.top = e.clientY + "px";
+      }
+    };
+
+    window.addEventListener("mousemove",move);
+    return ()=>window.removeEventListener("mousemove",move);
+
+  },[]);
+
+  const handleLogin = async (e)=>{
+    e.preventDefault();
+    setLoading(true);
+
     try{
-      const data = await getCourses();
+      const data = await loginUser(email,password);
 
-      // show ALL courses dynamically
-      setCourses(data);
+      if(!data.access_token){
+        toast.error("Invalid email or password");
+        setLoading(false);
+        return;
+      }
 
-    }catch(err){
-      console.error("Error loading courses", err);
+      localStorage.setItem("token",data.access_token);
+
+      const res = await fetch("http://127.0.0.1:8000/me", {
+        headers:{
+          Authorization:`Bearer ${data.access_token}`,
+        },
+      });
+
+      const userData = await res.json();
+
+      localStorage.setItem("user",JSON.stringify(userData));
+
+      toast.success("Login successful 🎉");
+
+      if(userData.role === "Admin"){
+        navigate("/admin/dashboard");
+      }else{
+        navigate("/student/dashboard");
+      }
+
+    }catch{
+      toast.error("Login failed");
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="home">
+    <div className="lux-login-page">
 
-      {/* HERO SECTION */}
+      {loading && <Loader/>}
 
-      <section className="hero">
+      <div className="lux-login-card">
 
-        <div className="hero-left">
+        <h2>Welcome Back</h2>
+        <p className="subtitle">Login to continue your learning journey</p>
 
-          <h1>
-            Upgrade Your Skills With
-            <span> Modern Tech Courses</span>
-          </h1>
+        <form onSubmit={handleLogin}>
 
-          <p>
-            Learn web development, AI, and data science through
-            industry-level projects and expert instructors.
-          </p>
-
-          <div className="hero-buttons">
-            <Link to="/courses" className="btn-primary">
-              Explore Courses
-            </Link>
-
-            <Link to="/register" className="btn-secondary">
-              Get Started
-            </Link>
+          <div className="form-group">
+            <input
+              type="email"
+              placeholder="Email address"
+              required
+              value={email}
+              onChange={(e)=>setEmail(e.target.value)}
+            />
           </div>
 
-        </div>
+          <div className="form-group">
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              value={password}
+              onChange={(e)=>setPassword(e.target.value)}
+            />
+          </div>
 
-        <div className="hero-right">
-          <img
-            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
-            alt="learning"
-          />
-        </div>
+          <button className="lux-login-btn" type="submit" disabled={loading}>
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
 
-      </section>
+        </form>
 
+        <p className="login-register">
+          Don't have an account?
+          <Link to="/register"> Create one</Link>
+        </p>
 
-      {/* POPULAR COURSES */}
-
-      <section className="courses">
-
-        <h2>Popular Courses</h2>
-
-        <div className="course-grid">
-
-          {courses.map((course) => (
-
-            <div key={course.id} className="course-card">
-
-              <img
-                src={
-                  course.image ||
-                  "https://images.unsplash.com/photo-1517694712202-14dd9538aa97"
-                }
-                alt={course.title}
-              />
-
-              <div className="course-content">
-
-                <h3>{course.title}</h3>
-
-                <p>{course.description}</p>
-
-                <div className="rating">
-                  ⭐⭐⭐⭐⭐ <span>(4.8)</span>
-                </div>
-
-                <Link to={`/courses/${course.id}`}>
-                  <button>View Course</button>
-                </Link>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </section>
-
-
-      {/* CTA */}
-
-      <section className="cta">
-
-        <h2>Start Your Learning Journey Today</h2>
-
-        <p>Join thousands of students learning modern tech skills.</p>
-
-        <Link to="/register" className="btn-primary">
-          Create Free Account
-        </Link>
-
-      </section>
+      </div>
 
     </div>
   );

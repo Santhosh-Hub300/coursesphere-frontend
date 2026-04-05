@@ -1,170 +1,157 @@
-import { useState,useEffect } from "react";
-import Loader from "../../components/Loader";
-import { getCourses,createCourse,deleteCourse } from "../../api.js";
-import { toast } from "react-toastify";
+import { useState, useEffect } from "react";
+import { getCourses, createCourse, deleteCourse } from "../../api.js";
 import "./ManageCourses.css";
 
-export default function ManageCourses(){
+export default function ManageCourses() {
 
-const [courses,setCourses]=useState([]);
-const [loading,setLoading]=useState(true);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const [form,setForm]=useState({
-title:"",
-description:"",
-level:"Beginner",
-duration:""
-});
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    level: "Beginner",
+    duration: ""
+  });
 
-useEffect(()=>{
-fetchCourses();
-},[]);
+  // FETCH
+  const fetchCourses = async () => {
+    try {
+      const data = await getCourses();
+      setCourses(Array.isArray(data) ? data : []);
+    } catch {
+      setCourses([]);
+    }
+    setLoading(false);
+  };
 
-const fetchCourses = async()=>{
-setLoading(true);
-const data = await getCourses();
-setCourses(data);
-setLoading(false);
-};
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
-const handleSubmit = async(e)=>{
-e.preventDefault();
+  // ADD
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-if(!form.title || !form.description || !form.duration){
-toast.error("Please fill all fields");
-return;
-}
+    if (!form.title || !form.description || !form.duration) {
+      alert("Fill all fields");
+      return;
+    }
 
-try{
+    const data = await createCourse(form);
 
-const data = await createCourse(form);
+    if (data.message) {
+      alert("Added ✅");
 
-if(data.message){
+      setForm({
+        title: "",
+        description: "",
+        level: "Beginner",
+        duration: ""
+      });
 
-toast.success(data.message);
+      fetchCourses();
+    }
+  };
 
-setForm({
-title:"",
-description:"",
-level:"Beginner",
-duration:""
-});
+  // DELETE
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this course?")) return;
 
-fetchCourses();
+    const data = await deleteCourse(id);
 
-}else{
-toast.error(data.detail || "Course creation failed");
-}
+    if (data.message) {
+      alert("Deleted ✅");
+      fetchCourses();
+    }
+  };
 
-}catch(err){
-toast.error("Server error");
-}
+  return (
+    <div className="manage-page">
 
-};
+      <div className="manage-top">
+        <h1>Manage Courses</h1>
+      </div>
 
-const handleDelete = async(id)=>{
+      <div className="table-card">
 
-const data = await deleteCourse(id);
+        {/* FORM */}
+        <form onSubmit={handleSubmit}>
 
-if(data.message){
-toast.success(data.message);
-fetchCourses();
-}else{
-toast.error(data.detail || "Delete failed");
-}
+          <input
+            placeholder="Title"
+            value={form.title}
+            onChange={(e)=>setForm({...form,title:e.target.value})}
+          />
 
-};
+          <input
+            placeholder="Description"
+            value={form.description}
+            onChange={(e)=>setForm({...form,description:e.target.value})}
+          />
 
-return(
+          <input
+            placeholder="Duration"
+            value={form.duration}
+            onChange={(e)=>setForm({...form,duration:e.target.value})}
+          />
 
-<div className="manage-page">
+          <select
+            value={form.level}
+            onChange={(e)=>setForm({...form,level:e.target.value})}
+          >
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
 
-{loading && <Loader/>}
+          <button className="add-btn">Add Course</button>
 
-<div className="manage-top">
+        </form>
 
-<div>
-<h1>Manage Courses</h1>
-<p>Control and organize all platform courses</p>
-</div>
+        {/* TABLE */}
+        {loading ? (
+          <p>Loading...</p>
+        ) : courses.length === 0 ? (
+          <p>No courses</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Level</th>
+                <th>Duration</th>
+                <th>Action</th> {/* 🔥 NEW */}
+              </tr>
+            </thead>
 
-</div>
+            <tbody>
+              {courses.map((c)=>(
+                <tr key={c.id}>
 
-<div className="table-card">
+                  <td>{c.title}</td>
 
-<form onSubmit={handleSubmit} style={{marginBottom:"30px"}}>
+                  <td>
+                    <span className={`level-badge level-${c.level.toLowerCase()}`}>
+                      {c.level}
+                    </span>
+                  </td>
 
-<input
-placeholder="Title"
-value={form.title}
-onChange={(e)=>setForm({...form,title:e.target.value})}
-/>
+                  <td>{c.duration}</td>
 
-<input
-placeholder="Description"
-value={form.description}
-onChange={(e)=>setForm({...form,description:e.target.value})}
-/>
+                  <td>
+                    <button onClick={()=>handleDelete(c.id)}>
+                      Delete
+                    </button>
+                  </td>
 
-<input
-placeholder="Duration"
-value={form.duration}
-onChange={(e)=>setForm({...form,duration:e.target.value})}
-/>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
 
-<select
-value={form.level}
-onChange={(e)=>setForm({...form,level:e.target.value})}
->
-<option>Beginner</option>
-<option>Intermediate</option>
-<option>Advanced</option>
-</select>
-
-<button className="add-btn">Add Course</button>
-
-</form>
-
-<table>
-
-<thead>
-<tr>
-<th>Course</th>
-<th>Level</th>
-<th>Duration</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody>
-
-{courses.map((c)=>(
-<tr key={c.id}>
-
-<td>{c.title}</td>
-<td>{c.level}</td>
-<td>{c.duration}</td>
-
-<td>
-<button
-className="add-btn"
-onClick={()=>handleDelete(c.id)}
->
-Delete
-</button>
-</td>
-
-</tr>
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-);
-
+      </div>
+    </div>
+  );
 }
